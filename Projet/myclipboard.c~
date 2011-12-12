@@ -31,8 +31,6 @@ int main() {
 	
 	
 	signal(SIGINT, detruire_shm);
-	printf("\nUn espace mémoire est partagé,\n");
-	printf("\nAppuyez sur ctrl-c pour quitter.\n");
 	pause();
 	return 0;
 }
