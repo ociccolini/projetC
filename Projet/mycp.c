@@ -26,9 +26,11 @@ void coller()
 			printf("Abandon!\n");
 			exit(0);
 		}
+		
+		printf("Fichier %s écrasé!\n", nomFichierCible);
 	}
 	
-	printf("Fichier %s écrasé!\n", nomFichierCible);
+	
 	fichierSource = fopen(memoirePartagee, "r");
 	fichierCible = fopen(nomFichierCible, "w+");
 	
@@ -81,7 +83,7 @@ int main(int argc, char *argv[])
 			
 	}
 	else {
-		printf("Veuillez entrer un nom de fichier!");
+		printf("Veuillez entrer un nom de fichier!\n");
 	}
 	
 	
