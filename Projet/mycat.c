@@ -9,7 +9,6 @@
 int main() {
 	
 	char * memoire;
-	//char memoire_partagee[8192];
 	char buffer[128], precedent[128];
 	int idshm;
 	key_t cle;
@@ -19,13 +18,11 @@ int main() {
 	idshm = shmget(cle, 0, 0);
 	memoire = shmat(idshm, NULL, SHM_RND);
 	
-	//strcpy(memoire_partagee, memoire);
-	//printf("%d\n", (int)sizeof(*memoire_partagee));
 	
 	bufferCirculaire = circbuf_init(memoire, sizeof(char[8192]));
 	
 	
-	for(;;) {
+	while(1) {
 		strcpy(precedent, buffer);
 		printf("> ");
 		fgets(buffer, sizeof(buffer), stdin);

@@ -27,8 +27,6 @@ int main() {
 	circbuf_format(memoirePartagee, sizeof(memoirePartagee));
 	
 	
-	
-	//strcpy(memoirePartagee, "");
 	shmdt(memoirePartagee);
 	
 	
