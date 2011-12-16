@@ -44,7 +44,7 @@ int main() {
 			strcpy(buffer, circbuf_get(bufferCirculaire, 0));
 		}
 		else
-			printf("%s", buffer);
+			printf("%s\n", buffer);
 	}
 	
 	

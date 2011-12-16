@@ -22,6 +22,21 @@ int main(int argc, char * argv[])
 	circbuf_append(buffer, var);
 	
 	printf("%d\n", circbuf_count(buffer));
+	printf("%s\n", circbuf_get(buffer, 0));
+	
+	
+	
+	circbuf_append(buffer, "olivier est un con");
+	
+	printf("%d\n", circbuf_count(buffer));
+	printf("%s\n", circbuf_get(buffer, 0));
+	
+	
+	
+	circbuf_append(buffer, "clement est trop gentil");
+	
+	printf("%d\n", circbuf_count(buffer));
+	printf("%s\n", circbuf_get(buffer, 0));
 	
 	
 	
