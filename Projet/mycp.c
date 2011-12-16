@@ -3,17 +3,16 @@
 #include <string.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include "circbuf.h"
 
-char * memoirePartagee;
-
-void coller()
+void coller(const char * nomFichierSource)
 {
 	FILE* fichierSource = NULL;
 	FILE* fichierCible = NULL;
 	char chaine[1000] = "";
 		
-	char * nomFichierCible = strrchr(memoirePartagee, '/') + 1;
-	char * reponse;
+	char * nomFichierCible = strrchr(nomFichierSource, '/') + 1;
+	char reponse[10];
 	
 	
 	if(fopen(nomFichierCible, "r"))
@@ -31,7 +30,7 @@ void coller()
 	}
 	
 	
-	fichierSource = fopen(memoirePartagee, "r");
+	fichierSource = fopen(nomFichierSource, "r");
 	fichierCible = fopen(nomFichierCible, "w+");
 	
 	if(fichierSource != NULL && fichierCible != NULL)
@@ -52,18 +51,29 @@ int main(int argc, char *argv[])
 	
 	key_t cle;
 	int idshm;
-	char * argumentCommande[3];
+//	char memoirePartagee[8192];
+	char * memoire;
+	circbuf bufferCirculaire;
+	
 	
 	cle = ftok("/etc/passwd", 1);
 	idshm = shmget(cle, 0, 0);
-	memoirePartagee = shmat(idshm, NULL, SHM_RND);
+	memoire = shmat(idshm, NULL, SHM_RND);
 	
+	//c = circbuf_init(mem, sizeof(char[1024]));
+	
+//		strcpy(memoirePartagee, memoire);
+	
+	bufferCirculaire = circbuf_init(memoire, sizeof(char[8192]));
+	printf("%d\n", circbuf_count(bufferCirculaire));
 	
 	if(argc > 1) {
 		
 		if(!strcmp(argv[1], "-a"))
 		{
-			coller();
+			printf("%d\n", circbuf_count(bufferCirculaire));
+			for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
+				coller(circbuf_get(bufferCirculaire, i));
 		}
 		else {
 			if(fopen(argv[1], "r")) {
@@ -74,7 +84,9 @@ int main(int argc, char *argv[])
 					argv[1] = strcat(strcat(path, "/"), argv[1]);
 				}
 				printf("%s\n", argv[1]);
-				strcpy(memoirePartagee, argv[1]);
+				//strcpy(memoirePartagee, argv[1]);
+				circbuf_append(bufferCirculaire, argv[1]);
+				printf("%d\n", circbuf_count(bufferCirculaire));
 			}
 			else {
 				printf("Le fichier '%s' n'existe pas\n", argv[1]);
@@ -87,8 +99,8 @@ int main(int argc, char *argv[])
 	}
 	
 	
-	
-	shmdt(memoirePartagee);
+	circbuf_shut(bufferCirculaire);
+	shmdt(memoire);
 	
 	return 0;
 }

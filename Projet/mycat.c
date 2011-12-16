@@ -8,8 +8,8 @@
 
 int main() {
 	
-	char * memoire_partagee;
-	char memoire[8192];
+	char * memoire;
+	//char memoire_partagee[8192];
 	char buffer[128], precedent[128];
 	int idshm;
 	key_t cle;
@@ -17,12 +17,12 @@ int main() {
 	
 	cle = ftok("/etc/passwd", 1);
 	idshm = shmget(cle, 0, 0);
-	memoire_partagee = shmat(idshm, NULL, SHM_RND);
+	memoire = shmat(idshm, NULL, SHM_RND);
 	
-	strcpy(memoire, memoire_partagee);
+	//strcpy(memoire_partagee, memoire);
 	//printf("%d\n", (int)sizeof(*memoire_partagee));
 	
-	bufferCirculaire = circbuf_init(memoire, sizeof(memoire));
+	bufferCirculaire = circbuf_init(memoire, sizeof(char[8192]));
 	
 	
 	for(;;) {
@@ -49,6 +49,6 @@ int main() {
 	
 	
 	circbuf_shut(bufferCirculaire);
-	shmdt(memoire_partagee);
+	shmdt(memoire);
 	return 0;
 }
