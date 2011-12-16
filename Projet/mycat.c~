@@ -22,7 +22,7 @@ int main() {
 	//strcpy(memoire_partagee, memoire);
 	//printf("%d\n", (int)sizeof(*memoire_partagee));
 	
-	bufferCirculaire = circbuf_init(memoire_partagee, sizeof(char[8192]));
+	bufferCirculaire = circbuf_init(memoire, sizeof(char[8192]));
 	
 	
 	for(;;) {
@@ -37,11 +37,28 @@ int main() {
 			circbuf_append(bufferCirculaire, precedent);
 			
 		}
-		else if(!strcmp(buffer, "coller\n"))
+		else if(strstr(buffer, "coller") != NULL)
 		{
-			for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
-				printf("%s", circbuf_get(bufferCirculaire, i));
-			strcpy(buffer, circbuf_get(bufferCirculaire, 0));
+			if(!strcmp(buffer, "coller\n")){
+				strcpy(buffer, circbuf_get(bufferCirculaire, 0));
+			}
+			else{
+				char * numero = strrchr(buffer, 'r') + 1;
+				strncpy(numero, numero, strlen(numero) - 2);
+				strcpy(buffer, circbuf_get(bufferCirculaire, atoi(numero)));
+			}
+			
+			printf("%s", buffer);
+		}
+		else if(!strcmp(buffer, "liste\n"))
+		{
+			for(int i = 0; i < circbuf_count(bufferCirculaire); i++){
+				printf("%d\t%s", i, circbuf_get(bufferCirculaire, i));
+			}
+		}
+		else if(!strcmp(buffer, "vider\n"))
+		{
+			circbuf_format(memoire, sizeof(char[8192]));
 		}
 		else
 			printf("%s", buffer);

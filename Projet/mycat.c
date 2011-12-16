@@ -37,11 +37,24 @@ int main() {
 			circbuf_append(bufferCirculaire, precedent);
 			
 		}
-		else if(!strcmp(buffer, "coller\n"))
+		else if(strstr(buffer, "coller") != NULL)
 		{
-			for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
-				printf("%s", circbuf_get(bufferCirculaire, i));
-			strcpy(buffer, circbuf_get(bufferCirculaire, 0));
+			if(!strcmp(buffer, "coller\n")){
+				strcpy(buffer, circbuf_get(bufferCirculaire, 0));
+			}
+			else{
+				char * numero = strrchr(buffer, 'r') + 1;
+				strncpy(numero, numero, strlen(numero) - 2);
+				strcpy(buffer, circbuf_get(bufferCirculaire, atoi(numero)));
+			}
+			
+			printf("%s", buffer);
+		}
+		else if(!strcmp(buffer, "liste\n"))
+		{
+			for(int i = 0; i < circbuf_count(bufferCirculaire); i++){
+				printf("%d\t%s", i, circbuf_get(bufferCirculaire, i));
+			}
 		}
 		else
 			printf("%s", buffer);

@@ -1,9 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*#include <stdlib.h>
+#include <string.h>*/
 #include <sys/shm.h>
 #include <unistd.h>
-#include "circbuf.h"
+//#include "circbuf.h"
 
 void coller(const char * nomFichierSource)
 {
@@ -46,12 +46,22 @@ void coller(const char * nomFichierSource)
 	}
 }
 
+void afficher_aide()
+{
+	printf("Utilisation : ./mycp fichier\n");
+	printf("         ou : ./mycp [OPTION]\n\n");
+	printf("Voici les options utilisables :\n");
+	printf("-a\t\tColler tous les fichiers précédemment copiés\n");
+	printf("-l\t\tLister tous les fichiers précédemment copiés\n");
+	printf("-h\t\tAfficher le manuel\n");
+	printf("-[n]\t\tColler le fichier numéro 'n' précédemment copiés\n");
+}
+
 int main(int argc, char *argv[])
 {
 	
 	key_t cle;
 	int idshm;
-//	char memoirePartagee[8192];
 	char * memoire;
 	circbuf bufferCirculaire;
 	
@@ -60,22 +70,32 @@ int main(int argc, char *argv[])
 	idshm = shmget(cle, 0, 0);
 	memoire = shmat(idshm, NULL, SHM_RND);
 	
-	c = circbuf_init(mem, sizeof(char[1024]));
-	
-//		strcpy(memoirePartagee, memoire);
-	
+
 	bufferCirculaire = circbuf_init(memoire, sizeof(char[8192]));
-	printf("%d\n", circbuf_count(bufferCirculaire));
 	
 	if(argc > 1) {
-		
-		if(!strcmp(argv[1], "-a"))
+		if((argv[1])[0] == '-')
 		{
-			printf("%d\n", circbuf_count(bufferCirculaire));
-			for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
-				coller(circbuf_get(bufferCirculaire, i));
+			if((argv[1])[1] == 'a')
+			{
+				for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
+					coller(circbuf_get(bufferCirculaire, i));
+			}
+			else if((argv[1])[1] == 'l')
+			{
+				for(int i = 0; i < circbuf_count(bufferCirculaire); i++)
+					printf("%d\t%s\n", i, strrchr(circbuf_get(bufferCirculaire, i), '/') + 1);
+			}
+			else if((argv[1])[1] == 'h')
+			{
+				afficher_aide();
+			}
+			else
+			{		
+				coller(circbuf_get(bufferCirculaire, atoi(&(argv[1])[1])));
+			}
 		}
-		else {
+		else{
 			if(fopen(argv[1], "r")) {
 				char c = (argv[1])[0];
 				if(c != '/') {
@@ -84,9 +104,7 @@ int main(int argc, char *argv[])
 					argv[1] = strcat(strcat(path, "/"), argv[1]);
 				}
 				printf("%s\n", argv[1]);
-				//strcpy(memoirePartagee, argv[1]);
 				circbuf_append(bufferCirculaire, argv[1]);
-				printf("%d\n", circbuf_count(bufferCirculaire));
 			}
 			else {
 				printf("Le fichier '%s' n'existe pas\n", argv[1]);
@@ -95,7 +113,8 @@ int main(int argc, char *argv[])
 			
 	}
 	else {
-		printf("Veuillez entrer un nom de fichier!\n");
+		printf("Veuillez entrez un paramètre ou un nom de fichier!\n");
+		printf("Pour plus d'informations, utilisez l'aide en saisissant 'mycp -h'\n");
 	}
 	
 	
